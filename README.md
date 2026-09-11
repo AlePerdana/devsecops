@@ -1,3 +1,9 @@
+Workshop DevOps</br>
+Dosen Pengampu : Dr. Ferry Astika Saputra, S.T., M.Sc.
+
+Disusun oleh:</br>
+Ale Perdana Putra Darmawan (3126640016)</br>
+
 # Materi Ajar — DevOps (DevSecOps Terintegrasi)
 
 Program Studi D4 Teknik Informatika — Politeknik Elektronika Negeri Surabaya (PENS).
