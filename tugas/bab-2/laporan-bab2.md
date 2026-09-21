@@ -1,21 +1,10 @@
-# Laporan Bab 2 
+# LAPORAN PRAKTIKUM BAB 2
+## Konsep Container dan Instalasi Docker
 
-<div align="center">
-  <h1 style="text-align: center;font-weight: bold">LAPORAN RESMI<br>WORKSHOP DEVOPS</h1>
-  <h4 style="text-align: center;">Dosen Pengampu : Dr. Ferry Astika Saputra, S.T., M.Sc.</h4>
-</div>
-<br />
-<div align="center">
-  <img src="https://upload.wikimedia.org/wikipedia/id/4/44/Logo_PENS.png" alt="Logo PENS">
-  <h3 style="text-align: center;">Disusun Oleh : </h3>
-  <p style="text-align: center;">
-    <strong>Ale Perdana Putra Darmawan (3126640016) </strong><br>
-  </p>
-<h3 style="text-align: center;line-height: 1.5">Politeknik Elektronika Negeri Surabaya<br>Departemen Teknik Informatika Dan Komputer<br>Program Studi Teknik Informatika<br>2026</h3>
-  <hr><hr>
-</div>
-
----
+**Nama**: Ale Perdana Putra Darmawan  
+**NIM**: 3126640016  
+**Kelas**: STr LJ A  
+**Tanggal pelaksanaan**: 12 September 2026
 
 ## 1. Tujuan Praktikum
 
@@ -24,25 +13,41 @@
 3. Menginstal Docker Engine serta menjalankan container pertama, melakukan inspeksi image, melihat log, dan membangun image custom sederhana.
 4. Memahami konfigurasi jaringan dan penyimpanan container beserta implikasi keamanannya.
 
----
+## 2. Dasar Teori Singkat
 
-## 2. Alat dan Bahan
+**Containerisasi** adalah mekanisme isolasi proses berbasis fitur kernel Linux. Container membungkus aplikasi beserta dependensinya sehingga dapat berjalan konsisten di berbagai lingkungan, tanpa menyertakan kernel sendiri seperti pada virtual machine.
 
-| No | Komponen | Keterangan |
-| --- | --- | --- |
-| 1 | Host Linux / Mesin Virtual Ubuntu | Lingkungan khusus laboratorium |
-| 2 | Docker Engine, Docker CLI | Runtime container |
-| 3 | containerd dan runc | High-level dan low-level runtime |
-| 4 | Plugin Buildx dan Compose | Build serta orkestrasi container |
-| 5 | Image `hello-world`, `nginx:1.26`, `ubuntu:22.04`, `nginx:1.26-alpine` | Bahan praktikum |
-| 6 | curl dan browser | Verifikasi akses layanan web |
-| 7 | Terminal / Shell | Eksekusi perintah |
+**Perbedaan VM dan container.** Virtual machine menjalankan sistem operasi tamu lengkap di atas hypervisor sehingga isolasinya kuat namun berukuran besar dan lambat untuk start. Container berbagi kernel host, sehingga lebih ringan, berukuran kecil, dan memiliki startup time jauh lebih singkat, tetapi boundary isolasinya bergantung pada konfigurasi kernel dan runtime.
 
----
+**Isolasi container** dibangun oleh dua fitur utama:
 
-## 3. Langkah Praktikum
+- **namespace** — membatasi apa yang dapat *dilihat* proses (PID, mount, network, IPC, UTS, user), sehingga container memiliki pandangan terpisah terhadap sistem.
+- **cgroup** — membatasi dan menghitung *pemakaian resource* (CPU, memori, I/O), sehingga satu container tidak menghabiskan resource host.
 
-### 3.0 Menyiapkan Direktori Kerja
+**Image dan layer.** Image bersusun atas layer *read-only* yang saling berbagi (*copy-on-write*). Saat container dijalankan, lapisan tulis (*writable layer*) ditambahkan di atas image. Format image dan runtime mengikuti OCI (Open Container Initiative), sehingga image dapat dipakai lintas runtime yang kompatibel.
+
+**Arsitektur Docker.** Docker CLI (client) mengirim perintah ke Docker daemon melalui API. Daemon mendelegasikan manajemen lifecycle tingkat tinggi kepada **containerd**, yang kemudian memerintahkan low-level runtime **runc** untuk membentuk isolasi sesuai OCI Runtime Specification. Image diambil dari **registry** (misalnya Docker Hub).
+
+**Dockerfile** mendefinisikan cara membangun image melalui instruksi seperti `FROM`, `COPY`, `RUN`, `EXPOSE`, dan `CMD`. Instruksi `EXPOSE` hanya metadata dan tidak memublikasikan port; publikasi port dilakukan melalui opsi `-p` pada `docker run`.
+
+**Implikasi keamanan.** Karena container berbagi kernel host, batas isolasi tidak sekuat VM. Akses ke daemon Docker dan keanggotaan grup `docker` secara praktis setara dengan akses root, sehingga attack surface daemon harus dibatasi ketat.
+
+## 3. Alat dan Lingkungan
+
+| Komponen | Hasil identifikasi |
+| --- | --- |
+| Host | Linux / Mesin Virtual Ubuntu (lingkungan khusus laboratorium) |
+| Runtime container | Docker Engine dan Docker CLI |
+| Runtime pendukung | containerd (high-level) dan runc (low-level) |
+| Plugin | Buildx dan Compose |
+| Image praktikum | `hello-world`, `nginx:1.26`, `ubuntu:22.04`, `nginx:1.26-alpine` |
+| Alat verifikasi | curl dan browser |
+| Terminal | Shell untuk eksekusi perintah |
+| Direktori kerja | `~/docker-lab/bab-2` |
+
+## 4. Langkah Praktikum
+
+### 4.1 Menyiapkan Direktori Kerja
 
 Gunakan satu direktori kerja per bab agar file konfigurasi, volume bind mount, dan laporan mudah dipisahkan.
 
@@ -51,7 +56,7 @@ mkdir -p ~/docker-lab/bab-2
 cd ~/docker-lab/bab-2
 ```
 
-### 3.1 Praktikum 1 — Instalasi Docker Engine Ubuntu
+### 4.2 Praktikum 1 — Instalasi Docker Engine Ubuntu
 
 Langkah berikut dijalankan secara berurutan, lalu diverifikasi sebelum melanjutkan.
 
@@ -85,7 +90,7 @@ Hasil:
 
 *Gambar 2. Eksekusi image `hello-world` sebagai verifikasi instalasi.*
 
-### 3.2 Praktikum 2 — Container Nginx dan Ubuntu Interaktif
+### 4.3 Praktikum 2 — Container Nginx dan Ubuntu Interaktif
 
 ```bash
 docker pull nginx:1.26
@@ -138,7 +143,7 @@ Hasil:
 
 *Gambar 6. Pemeriksaan `/etc/os-release` di dalam container `ubuntu:22.04`.*
 
-### 3.3 Praktikum 3 — Dockerfile Custom Web Statis
+### 4.4 Praktikum 3 — Dockerfile Custom Web Statis
 
 ```bash
 mkdir -p ~/docker-lab/custom-web && cd ~/docker-lab/custom-web
@@ -175,17 +180,27 @@ Hasil:
 
 *Gambar 8. Proses build image `pens-web:1.0`, eksekusi container `pens-app`, dan hasil `curl http://localhost:9090`.*
 
----
+## 5. Hasil Pengujian
 
-## 4. Verifikasi dan Skenario Pengujian
+### 5.1 Checklist Hasil
 
-- [ ] Docker Engine aktif dan `docker version` menampilkan Client serta Server.
-- [ ] User non-root dapat menjalankan `docker ps` tanpa `sudo`.
-- [ ] Container Nginx dapat diakses dari browser melalui port host.
-- [ ] Image `pens-web:1.0` berhasil dibangun dan dijalankan.
+- [x] Docker Engine aktif dan `docker version` menampilkan Client serta Server.
+- [x] User non-root dapat menjalankan `docker ps` tanpa `sudo`.
+- [x] Container Nginx dapat diakses dari browser melalui port host.
+- [x] Image `pens-web:1.0` berhasil dibangun dan dijalankan.
 - [ ] Mahasiswa dapat menjelaskan perbedaan `EXPOSE` dan `-p`.
 
-Prinsip troubleshooting: mulai dari status container, baca logs, cek network, cek volume, lalu validasi konfigurasi. Jangan langsung menghapus volume sebelum memahami apakah data masih dibutuhkan.
+### 5.2 Ringkasan Hasil per Praktikum
+
+| Praktikum | Hasil |
+| --- | --- |
+| Instalasi Docker Engine | Daemon Docker aktif dan dapat diakses pengguna biasa (non-root) tanpa `sudo`; image `hello-world` berhasil dieksekusi. |
+| Container Nginx dan Ubuntu interaktif | Container `web-public` berjalan dengan pemetaan port 8080→80 dan dapat diakses melalui `curl`; shell interaktif `ubuntu:22.04` berhasil dijalankan. |
+| Dockerfile custom web statis | Image `pens-web:1.0` terbentuk dari base `nginx:1.26-alpine` dan berjalan pada port 9090. |
+
+### 5.3 Prinsip Troubleshooting
+
+Mulai dari status container, baca logs, cek network, cek volume, lalu validasi konfigurasi. Jangan langsung menghapus volume sebelum memahami apakah data masih dibutuhkan.
 
 ```bash
 docker compose ps
@@ -196,76 +211,67 @@ docker volume ls
 docker inspect <container-name>
 ```
 
----
+## 6. Threat Statement
 
-## 5. Hasil dan Pembahasan
+| Unsur | Isi |
+| --- | --- |
+| Aset | Image container aplikasi, source code, akses daemon Docker, dan kredensial registry |
+| Aktor ancaman | Penyerang eksternal, pengguna lokal dengan akses terbatas, atau pihak dengan akses ke akun pengguna host |
+| Jalur serangan | Base image yang rentan atau tidak tepercaya, tag `latest` yang berubah, container `--privileged`, bind mount ke filesystem host, dan penyalahgunaan keanggotaan grup `docker` |
+| Dampak | Kompromi penuh host (setara root), penyebaran artefak berbahaya, dan kompromi layanan produksi |
 
-### 5.1 Praktikum 1 — Instalasi Docker Engine
+**Threat statement:** Aset yang dilindungi adalah image container aplikasi, source code, akses ke daemon Docker, dan kredensial registry pada pipeline. Aktor ancaman dapat berupa penyerang eksternal maupun pengguna dengan akses terbatas pada host. Jalur serangan meliputi penggunaan base image yang rentan atau tidak tepercaya, ketergantungan pada tag `latest`, eksekusi container dengan `--privileged`, bind mount ke filesystem host, serta penyalahgunaan akses grup `docker`. Dampak yang mungkin terjadi adalah kompromi penuh host karena akses daemon setara root, penyebaran artefak berbahaya, dan kompromi layanan produksi.
 
-Dari instalasi Docker dan percobaan menjalankan sebuah container, hasilnya untuk lingkungan host memiliki daemon Docker yang aktif dan dapat diakses oleh pengguna biasa (non-root) tanpa memerlukan perintah `sudo` setiap kali eksekusi.
+## 7. Analisis
 
-### 5.2 Praktikum 2 — Container Nginx dan Ubuntu Interaktif
-
-Langkah ini mendemonstrasikan siklus hidup container, penggunaan network namespace untuk akses port dari host ke container (pemetaan port 8080 ke 80), serta pengambilan rekam jejak eksekusi (logs).
-
-### 5.3 Praktikum 3 — Dockerfile Custom Web Statis
-
-Langkah ini mendokumentasikan proses otomasi pembuatan image menggunakan layer yang read-only, di mana instruksi `COPY` menambahkan konten spesifik di atas base image yang sudah ada.
-
----
-
-## 6. Analisis Wajib
-
-### 6.1 Masalah yang Muncul dan Cara Mendiagnosisnya
+### 7.1 Masalah yang Muncul dan Cara Mendiagnosisnya
 
 **Masalah:** Muncul pesan error `Permission denied` saat mencoba menjalankan perintah `docker ps` atau `docker run` tanpa `sudo`.
 
-**Jawaban:** Mengacu pada prinsip troubleshooting keamanan, masalah ini diperiksa dengan melihat konfigurasi grup sistem. Pesan tersebut menunjukkan pengguna saat ini belum memiliki akses ke soket Docker. Solusinya adalah memverifikasi keanggotaan pengguna dalam grup Docker (`groups $USER`), kemudian menjalankan `sudo usermod -aG docker $USER` dilanjutkan dengan `newgrp docker` agar sesi terminal diperbarui.
+**Cara mendiagnosis:** Mengacu pada prinsip troubleshooting keamanan, masalah ini diperiksa dengan melihat konfigurasi grup sistem. Pesan tersebut menunjukkan pengguna saat ini belum memiliki akses ke soket Docker. Solusinya adalah memverifikasi keanggotaan pengguna dalam grup Docker (`groups $USER`), kemudian menjalankan `sudo usermod -aG docker $USER` dilanjutkan dengan `newgrp docker` agar sesi terminal diperbarui.
 
-### 6.2 Risiko Keamanan atau Operasional yang Relevan
+### 7.2 Risiko Keamanan atau Operasional yang Relevan
 
-Risiko operasional dan keamanan tertinggi berkaitan dengan akses daemon dan lifecycle image. Keanggotaan di dalam grup `docker` secara praktis memberikan privilege yang setara dengan akses root di sistem host, sehingga jika akun pengguna diretas, host dapat dikompromi penuh. Selain itu, batas isolasi container tidak sekuat Virtual Machine karena container menggunakan kernel yang sama dengan host, sehingga attack surface daemon harus dibatasi ketat.
+Risiko operasional dan keamanan tertinggi berkaitan dengan akses daemon dan lifecycle image. Keanggotaan di dalam grup `docker` secara praktis memberikan privilege yang setara dengan akses root di sistem host, sehingga jika akun pengguna diretas, host dapat dikompromi penuh. Selain itu, batas isolasi container tidak sekuat virtual machine karena container menggunakan kernel yang sama dengan host, sehingga attack surface daemon harus dibatasi ketat.
 
-### 6.3 Rekomendasi Perbaikan untuk Production-like Environment
+### 7.3 Rekomendasi Perbaikan untuk Production-like Environment
 
 Untuk lingkungan produksi, konfigurasi arsitektur container harus diperkeras (*hardened*). **Pertama**, gunakan *rootless mode* untuk memitigasi risiko daemon mengeksekusi proses sebagai root pada host. **Kedua**, gunakan tag digest yang definitif, bukan `latest`, serta terapkan *multi-stage build* untuk meminimalkan attack surface dan ukuran image. **Ketiga**, atur kuota memori dan CPU menggunakan konfigurasi cgroup (misalnya penambahan `--memory` atau `--cpus`) untuk mencegah satu container menghabiskan resource sistem secara penuh.
 
----
-
-## 7. Evaluasi dan Latihan Mandiri
+### 7.4 Evaluasi dan Latihan Mandiri
 
 **1. Mengapa penggunaan tag `latest` tidak dianjurkan untuk deployment yang harus reproducible?**
-
-Tag `latest` hanyalah sebuah label dinamis yang dapat berpindah untuk menunjuk ke versi baru kapan saja. Penggunaannya menyebabkan hilangnya reproduksibilitas karena pipeline atau lingkungan produksi mungkin menarik versi peranti lunak yang berbeda di hari yang berbeda, yang dapat mengubah perilaku aplikasi. Reproducible deployment memerlukan pengikatan ke versi spesifik agar perubahan dapat dilacak secara eksplisit.
+Tag `latest` hanyalah label dinamis yang dapat berpindah untuk menunjuk ke versi baru kapan saja, sehingga pipeline atau lingkungan produksi mungkin menarik versi peranti lunak yang berbeda di hari yang berbeda. Reproducible deployment memerlukan pengikatan ke versi spesifik agar perubahan dapat dilacak secara eksplisit.
 
 **2. Jelaskan peran containerd dan runc dalam arsitektur Docker.**
-
-Dalam arsitektur runtime modern, daemon Docker mendelegasikan manajemen lifecycle kontainer tingkat tinggi kepada containerd. Selanjutnya, containerd akan memerintahkan low-level runtime bernama runc untuk benar-benar berinteraksi dengan kernel OS guna membentuk batas isolasi sesuai dengan OCI Runtime Specification.
+Daemon Docker mendelegasikan manajemen lifecycle kontainer tingkat tinggi kepada containerd. Selanjutnya, containerd memerintahkan low-level runtime runc untuk berinteraksi dengan kernel OS guna membentuk batas isolasi sesuai OCI Runtime Specification.
 
 **3. Apa konsekuensi keamanan dari memasukkan user ke group `docker`?**
-
-Memasukkan user ke dalam grup `docker` memberikan kemampuan mengeksekusi perintah pada daemon Docker yang berjalan sebagai root. Akses ini setara dengan hak root tanpa `sudo`, karena user tersebut dapat dengan mudah meluncurkan container dengan flag `--privileged` atau melakukan bind mount pada filesystem host, yang memungkinkan pengambilalihan sistem host secara menyeluruh.
+Keanggotaan grup `docker` memberikan kemampuan mengeksekusi perintah pada daemon Docker yang berjalan sebagai root, sehingga setara dengan hak root tanpa `sudo`. User tersebut dapat meluncurkan container `--privileged` atau melakukan bind mount pada filesystem host yang memungkinkan pengambilalihan sistem host secara menyeluruh.
 
 **4. Bandingkan layer image `nginx:1.26-alpine` dan image custom yang Anda buat.**
-
-Image `nginx:1.26-alpine` bertindak sebagai base image atau fondasi awal yang berisi layer-layer sistem operasi minimal Alpine dan instalasi Nginx standar. Sedangkan image custom (`pens-web:1.0`) berisi seluruh layer dari base image tersebut, ditambah dengan layer baru yang tercipta dari eksekusi instruksi `COPY` untuk memasukkan dokumen `index.html` kustom ke dalam direktori Nginx.
+`nginx:1.26-alpine` adalah base image yang berisi layer sistem operasi minimal Alpine dan instalasi Nginx standar. Image custom (`pens-web:1.0`) memuat seluruh layer base tersebut ditambah layer baru hasil instruksi `COPY` yang memasukkan `index.html` kustom ke direktori Nginx.
 
 **5. Kapan sebaiknya memilih VM daripada container?**
+Mesin Virtual dipilih apabila lingkungan membutuhkan isolasi infrastruktur dan boundary keamanan yang jauh lebih ketat melalui hypervisor, misalnya ketika menjalankan beban kerja dengan tingkat kepercayaan berbeda atau membutuhkan kernel terpisah.
 
-Mesin Virtual (VM) sebaiknya dipilih apabila lingkungan membutuhkan isolasi infrastruktur dan boundary keamanan yang jauh lebih ketat melalui hypervisor.
+## 8. Tindak Lanjut
 
----
-
-## 8. Troubleshooting dan Analisis Hasil
+### 8.1 Troubleshooting dan Analisis Hasil
 
 | Gejala | Penyebab yang mungkin | Tindakan korektif |
 | --- | --- | --- |
-| Gate berbeda antara lokal dan pipeline | Versi tool, input efektif, atau konfigurasi tidak sama | Pin versi; simpan konfigurasi efektif dan identitas artefak. |
-| Service sehat tetapi security gate gagal | Healthcheck hanya memeriksa availability | Tinjau policy, scan, identity, signature, dan evidence secara terpisah. |
-| Evidence tidak dapat ditelusuri | Commit, digest, waktu, atau owner tidak dicatat | Gunakan manifest evidence dan metadata yang konsisten. |
-| Deployment gagal dipulihkan | Rollback, backup, atau credential rotation belum diuji | Lakukan recovery exercise dan dokumentasikan hasilnya. |
+| Permission denied pada Docker socket | Akun belum memiliki akses ke soket Docker | Tambahkan pengguna ke grup `docker`, lalu perbarui sesi; jangan membuka permission socket ke semua pengguna |
+| Image tidak dapat diunduh | Nama/tag image salah atau registry tidak terjangkau | Verifikasi nama dan tag image, lalu periksa konektivitas ke registry |
+| Port sudah digunakan | Port host telah dipakai proses lain | Ubah pemetaan port host atau hentikan proses yang menempati port |
+| Container langsung berhenti | Proses utama selesai atau gagal dijalankan | Periksa `docker logs <container>` dan pastikan `CMD` menjalankan proses long-running |
 
----
+### 8.2 Tindak Lanjut
+
+1. Melanjutkan ke Bab 3 untuk mempelajari network, volume, bind mount, tmpfs, dan Compose pada aplikasi multi-container.
+2. Menerapkan `rootless mode`, pinning digest image, dan *multi-stage build* pada eksperimen berikutnya.
+3. Menerapkan pembatasan resource (`--memory`, `--cpus`) serta opsi `:ro` pada volume agar tidak menulis ke host.
+4. Menjalankan pemindaian image untuk memverifikasi base image yang digunakan pada container produksi.
 
 ## 9. Kesimpulan
 
@@ -274,3 +280,10 @@ Mesin Virtual (VM) sebaiknya dipilih apabila lingkungan membutuhkan isolasi infr
 3. Siklus hidup container berhasil didemonstrasikan melalui container Nginx dengan pemetaan port 8080 ke 80, pemeriksaan status via `docker ps`, pembacaan log, serta akses shell interaktif pada `ubuntu:22.04`.
 4. Image custom `pens-web:1.0` berhasil dibangun dari base `nginx:1.26-alpine` dan dijalankan pada port 9090, menunjukkan bahwa instruksi `COPY` menambahkan layer baru di atas layer base image yang bersifat read-only.
 5. Keanggotaan dalam grup `docker` setara dengan akses root pada host; untuk lingkungan produksi diperlukan rootless mode, penggunaan digest alih-alih `latest`, multi-stage build, serta pembatasan resource melalui cgroup.
+
+## 10. Referensi
+
+1. Ferry Astika Saputra, "Bab 2 — Konsep Container dan Instalasi Docker," repository DevSecOps PENS, `bab-02.md`: https://github.com/ferryas-pens/devsecops/blob/main/bab-02.md
+2. Docker Documentation, *Docker Engine Installation*: https://docs.docker.com/engine/install/
+3. Docker Documentation, *Docker Engine Security*: https://docs.docker.com/engine/security/
+4. OCI, *Open Container Initiative Runtime Specification*: https://github.com/opencontainers/runtime-spec
