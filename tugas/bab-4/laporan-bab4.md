@@ -6,6 +6,8 @@
 **Kelas**: STr LJ A  
 **Tanggal pelaksanaan**: 3 Oktober 2026
 
+> **Disclaimer penggunaan AI.** Laporan praktikum ini disusun dengan bantuan kecerdasan buatan (AI) yang difungsikan sebagai alat dokumentasi. AI digunakan untuk merapikan catatan praktikum, menyusun struktur dan alur penulisan laporan, serta menyunting tata bahasa. Seluruh pelaksanaan praktikum, pengambilan bukti berupa screenshot, verifikasi keluaran perintah, dan pengambilan kesimpulan tetap dilakukan secara mandiri oleh saya.
+
 ## 1. Tujuan Praktikum
 
 1. Menjalankan Apache dan Nginx sebagai web server container dengan konfigurasi custom melalui Docker Compose.
@@ -445,6 +447,23 @@ Dalam percobaan bab 4 ini, saya tidak menemukan masalah saat mencoba praktikum.
    - Jangan hardcode kredensial; pakai `.env` atau secret.
 10. **Testing:**
     - Tambah acceptance test dan regression test sebelum rilis.
+
+### 7.4 Evaluasi dan Latihan Mandiri
+
+**1. Mengapa reverse proxy tidak seharusnya menjalankan semua logic aplikasi?**
+Reverse proxy sebaiknya hanya menangani tugas lalu lintas seperti terminasi TLS, routing, dan normalisasi path, bukan logika bisnis. Menempatkan seluruh logic di proxy menjadikannya titik kegagalan tunggal dan menyulitkan pemisahan tanggung jawab serta penskalaan backend.
+
+**2. Apa perbedaan TLS termination dan end-to-end TLS?**
+Pada TLS termination, enkripsi berhenti di reverse proxy dan trafik ke backend diteruskan sebagai HTTP biasa, sedangkan pada end-to-end TLS enkripsi tetap dipertahankan hingga backend. End-to-end lebih aman untuk jalur internal tetapi menambah beban sertifikat dan kompleksitas pengelolaan.
+
+**3. Bagaimana cara mengisolasi backend agar tidak langsung diakses dari host?**
+Backend ditempatkan pada network internal dan port-nya tidak dipublikasikan ke host, sehingga hanya dapat dijangkau melalui reverse proxy di dalam network yang sama. Network juga dapat ditandai `internal: true` bila backend tidak perlu keluar ke jaringan luar.
+
+**4. Apa konsekuensi menyimpan private key TLS di bind mount?**
+Private key pada bind mount mudah dibaca proses lain di host dan berisiko ikut ter-commit ke repositori, sehingga kerahasiaan identitas TLS dapat bocor. Praktik yang lebih aman adalah menyimpannya sebagai Docker secret atau di secret manager dengan permission minimum dan rotasi berkala.
+
+**5. Bandingkan log Nginx dan log Apache dari sisi format dan kegunaan debugging.**
+Log Nginx ringkas dan terstruktur sehingga cocok untuk audit lalu lintas serta analisis pola akses, sedangkan log Apache lebih modular dan rinci lewat pemisahan access dan error log per modul. Untuk debugging, log Apache lebih membantu menelusuri masalah modul, sementara log Nginx lebih ringkas untuk memantau request dan status.
 
 ## 8. Tindak Lanjut
 

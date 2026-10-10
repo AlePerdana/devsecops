@@ -6,6 +6,8 @@
 **Kelas**: STr LJ A  
 **Tanggal pelaksanaan**: 12 September 2026
 
+> **Disclaimer penggunaan AI.** Laporan praktikum ini disusun dengan bantuan kecerdasan buatan (AI) yang difungsikan sebagai alat dokumentasi. AI digunakan untuk merapikan catatan praktikum, menyusun struktur dan alur penulisan laporan, serta menyunting tata bahasa. Seluruh pelaksanaan praktikum, pengambilan bukti berupa screenshot, verifikasi keluaran perintah, dan pengambilan kesimpulan tetap dilakukan secara mandiri oleh saya.
+
 ## 1. Tujuan Praktikum
 
 1. Membuat user-defined bridge network dan membuktikan resolusi nama antar container.
@@ -194,6 +196,23 @@ Risiko utama pada bab ini adalah **perluasan attack surface akibat publikasi por
 ### 7.3 Rekomendasi Perbaikan untuk Production-like Environment
 
 **Pertama**, terapkan prinsip least exposure: publikasikan hanya satu ingress yang diperlukan dan ikat ke alamat spesifik (`127.0.0.1:8080:80`), sementara database dan dashboard administratif tetap internal. **Kedua**, gunakan mount `:ro` bila write tidak diperlukan, pertimbangkan filesystem `read_only`, jalankan container sebagai user non-root (sudah diterapkan melalui `USER appuser`), dan batasi capability seminimal mungkin. **Ketiga**, pindahkan data sensitif dari `environment` ke Compose secret atau secret manager, batasi permission sumber secret, dan lakukan rotasi setelah penggunaan — password pada praktikum ini bersifat sintetis untuk lingkungan disposable dan tidak boleh dikomit ke repository. **Keempat**, pin image dengan digest atau tag versi spesifik, pertahankan pemisahan network `frontend`/`backend`, serta lengkapi dengan healthcheck yang bermakna, resource limit, dan logging. Terakhir, seluruh kontrol keamanan harus diuji pada model yang telah di-resolve dengan `docker compose config`, bukan hanya pada fragmen YAML.
+
+### 7.4 Evaluasi dan Latihan Mandiri
+
+**1. Mengapa user-defined bridge lebih baik daripada default bridge untuk multi-container app?**
+User-defined bridge menyediakan isolasi antar project sekaligus resolusi DNS otomatis berdasarkan nama service, sehingga container dapat saling menemukan tanpa bergantung pada alamat IP yang berubah. Default bridge tidak memiliki DNS internal tersebut dan menempatkan semua container pada satu jaringan yang saling terlihat.
+
+**2. Apa risiko bind mount terhadap keamanan host?**
+Bind mount memberi proses di dalam container akses langsung ke berkas host dengan akses tulis secara default, sehingga container yang dikompromikan dapat mengubah atau menghapus berkas host. Path-nya juga tidak portabel dan dapat menutupi isi direktori container selama mount aktif.
+
+**3. Apa perbedaan `docker compose down` dan `docker compose down -v`?**
+`docker compose down` menghentikan lalu menghapus container dan network project tetapi mempertahankan volume data. Opsi `-v` ikut menghapus volume sehingga bersifat destruktif, misalnya menghilangkan isi `pg-data`.
+
+**4. Kapan `depends_on` dengan healthcheck lebih tepat daripada `depends_on` biasa?**
+`depends_on` biasa hanya menjamin urutan pembuatan container, bukan kesiapan service di dalamnya. `condition: service_healthy` lebih tepat ketika sebuah service bergantung pada kesiapan penuh, misalnya aplikasi yang harus menunggu database benar-benar menerima koneksi.
+
+**5. Bagaimana strategi backup volume untuk database produksi?**
+Backup dilakukan dengan menjalankan dump logis database (misalnya `pg_dump`) ke luar volume lalu menyimpannya di lokasi terpisah, bukan sekadar menyalin berkas volume. Prosedur restore harus diuji berkala karena named volume tidak memiliki backup otomatis.
 
 ## 8. Tindak Lanjut
 

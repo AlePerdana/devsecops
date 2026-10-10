@@ -6,6 +6,8 @@
 **Kelas**: STr LJ A  
 **Tanggal pelaksanaan**: 12 September 2026
 
+> **Disclaimer penggunaan AI.** Laporan praktikum ini disusun dengan bantuan kecerdasan buatan (AI) yang difungsikan sebagai alat dokumentasi. AI digunakan untuk merapikan catatan praktikum, menyusun struktur dan alur penulisan laporan, serta menyunting tata bahasa. Seluruh pelaksanaan praktikum, pengambilan bukti berupa screenshot, verifikasi keluaran perintah, dan pengambilan kesimpulan tetap dilakukan secara mandiri oleh saya.
+
 ## 1. Tujuan Praktikum
 
 1. Menyiapkan direktori kerja (*workspace*) tunggal sebagai lokasi seluruh eksperimen DevSecOps.
@@ -253,6 +255,17 @@ Pembatasan izin pada direktori `reports`, `sbom`, dan `keys` menerapkan prinsip 
 | Disk cepat penuh | Image dan cache build menumpuk | Gunakan `docker system df`; lakukan pembersihan selektif setelah memastikan volume data tidak dibutuhkan. |
 
 Pemeriksaan pemakaian disk dapat dilakukan dengan `docker system df` apabila diperlukan. Perintah ini tidak dijalankan pada praktikum ini dan tidak memerlukan tangkapan layar tersendiri.
+
+### 7.4 Evaluasi dan Latihan Mandiri
+
+**1. Mengapa DevSecOps tidak dapat direduksi menjadi penambahan scanner pada pipeline?**
+DevSecOps adalah perubahan budaya, proses, dan tata kelola yang menempatkan keamanan pada seluruh siklus hidup, bukan sekadar pemasangan alat pemindai. Tanpa pemahaman risiko dan tindak lanjut, scanner hanya menghasilkan temuan yang menumpuk tanpa perbaikan nyata.
+
+**2. Evidence apa yang membedakan klaim kontrol dari kontrol yang benar-benar terverifikasi?**
+Klaim kontrol hanyalah pernyataan bahwa suatu pengamanan seharusnya berjalan, sedangkan kontrol terverifikasi dibuktikan oleh evidence seperti log, keluaran perintah, digest image, atau artefak hasil pengujian yang dapat ditelusuri. Evidence inilah yang membedakan asumsi dari kenyataan yang dapat dipertanggungjawabkan.
+
+**3. Bagaimana shared responsibility memengaruhi ownership risiko dan tindak lanjut temuan?**
+Shared responsibility membagi tanggung jawab keamanan antara tim platform dan pemilik layanan sehingga setiap temuan memiliki penanggung jawab yang jelas. Tanpa pembagian yang tegas, temuan berisiko menjadi tidak bertuan dan tidak pernah diperbaiki.
 
 ## 8. Tindak Lanjut
 
