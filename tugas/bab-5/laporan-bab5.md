@@ -3,7 +3,7 @@
 
 **Nama**: Ale Perdana Putra Darmawan  
 **NIM**: 3126640016  
-**Kelas**: STr LJ A  
+**Kelas**: STr LJ Teknik Informatika A  
 **Tanggal pelaksanaan**: 9 Oktober 2026
 
 > **Disclaimer penggunaan AI.** Laporan praktikum ini disusun dengan bantuan kecerdasan buatan (AI) yang difungsikan sebagai alat dokumentasi. AI digunakan untuk merapikan catatan praktikum, menyusun struktur dan alur penulisan laporan, serta menyunting tata bahasa. Seluruh pelaksanaan praktikum, pengambilan bukti berupa screenshot, verifikasi keluaran perintah, dan pengambilan kesimpulan tetap dilakukan secara mandiri oleh saya.
